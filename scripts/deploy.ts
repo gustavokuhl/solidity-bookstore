@@ -1,11 +1,13 @@
 import { ethers } from "hardhat"
 
 async function main() {
-  const lock = await ethers.deployContract("BookDatabase")
+  const bookDatabase = await ethers.deployContract("BookDatabase")
 
-  await lock.waitForDeployment()
+  await bookDatabase.waitForDeployment()
 
-  console.log("Deploy finished!")
+  const address = await bookDatabase.getAddress()
+
+  console.log(`Deploy finished at ${address}`)
 }
 
 main().catch((error) => {
