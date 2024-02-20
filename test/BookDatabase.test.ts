@@ -23,4 +23,48 @@ describe("BookDatabase", function () {
     const count = await bookDatabase.count()
     expect(count).to.equal(0)
   })
+
+  it("Should add book", async function () {
+    const { bookDatabase, owner, otherAccount } = await loadFixture(
+      deployFixture
+    )
+    await bookDatabase.addBook({ title: "New Book", year: 2024 })
+
+    const count = await bookDatabase.count()
+    expect(count).to.equal(1)
+  })
+
+  it("Should update book", async function () {
+    const { bookDatabase, owner, otherAccount } = await loadFixture(
+      deployFixture
+    )
+    await bookDatabase.addBook({ title: "New Book", year: 2024 })
+    await bookDatabase.changeBook(1, { title: "New Title", year: 2024 })
+
+    const book = await bookDatabase.books(1)
+    expect(book.title).to.equal("New Title")
+  })
+
+  it("Should delete book", async function () {
+    const { bookDatabase, owner, otherAccount } = await loadFixture(
+      deployFixture
+    )
+    await bookDatabase.addBook({ title: "New Book", year: 2024 })
+    await bookDatabase.deleteBook(1)
+
+    const count = await bookDatabase.count()
+    expect(count).to.equal(0)
+  })
+
+  it("Should NOT delete book", async function () {
+    const { bookDatabase, owner, otherAccount } = await loadFixture(
+      deployFixture
+    )
+
+    const instance = bookDatabase.connect(otherAccount)
+    await instance.addBook({ title: "New Book", year: 2024 })
+    await expect(instance.deleteBook(1)).to.be.revertedWith(
+      "You don't have permission"
+    )
+  })
 })
